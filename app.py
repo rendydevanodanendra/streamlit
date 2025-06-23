@@ -24,7 +24,7 @@ st.title("Klasifikasi Data dengan Decision Tree")
 uploaded_file = st.file_uploader("Upload file CSV", type="csv")
 
 if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
+    df = pd.read_csv(uploaded_file, decimal=',')  # Tangani koma sebagai desimal
     st.write("Data Awal:")
     st.dataframe(df)
 
@@ -35,6 +35,14 @@ if uploaded_file is not None:
     if target_col:
         X = df.drop(columns=[target_col])
         y = df[target_col]
+
+        # Pastikan target numerik
+        y = pd.to_numeric(y, errors='coerce')
+
+        # Cek missing value
+        if X.isnull().any().any() or y.isnull().any():
+            st.error("Data masih mengandung missing value atau nilai non-numerik. Periksa dataset Anda.")
+            st.stop()
 
         # Imputasi Missing Value
         imp = SimpleImputer(strategy="mean")
